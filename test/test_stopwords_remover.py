@@ -1,11 +1,8 @@
 import unittest
-import sys
 from ..src.stopwords_remover import remove_stopwords
 
 
 class TestStopWordsRemover(unittest.TestCase):
-    def setUp(self):
-        pass
 
     def test_stopwords_remover(self):
         input_list = [
