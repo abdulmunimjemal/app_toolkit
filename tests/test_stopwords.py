@@ -1,5 +1,5 @@
 import unittest
-from ..src.stopwords_remover import remove_stopwords
+from app_toolkit.cleaners.stopwords_remover import remove_stopwords
 
 
 class TestStopWordsRemover(unittest.TestCase):

@@ -10,8 +10,10 @@
 *************************************************************************
 """
 
+DEFAULT_PATH = "data/stopwords-am.txt"
 
-def remove_stopwords(input_list: list, stopwords_file: str = "src/resources/stopwords-am.txt") -> list:
+
+def remove_stopwords(input_list: list, stopwords_file: str = DEFAULT_PATH) -> list:
     """
     Removes stopwords from a list
     """
@@ -39,19 +41,5 @@ def help():
     print("***********************************************")
 
 
-TEST_CASES = [
-    "አበባ እና ከበደ ጓደኛሞች ናቸው"
-]
-
-
-def test():
-    for TEST in TEST_CASES:
-        print(f"{TEST} -> {remove_stopwords(TEST)}")
-
-
 if __name__ == '__main__':
-    print("Do you want to test the module? Y/N")
-    if input().lower() == 'y':
-        test()
-    else:
-        help()
+    help()
