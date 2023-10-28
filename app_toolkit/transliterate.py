@@ -1,7 +1,6 @@
 """
 *************************************************************************
 * Function: Transliterate Amharic Geez terms to Latin Alphabet          *
-* Usage:                                *
 * Author: Abdulmunim J Jemal                                            *
 * Prepared as part of the Amharic Spell Checker Project                 *
 * Course: Fundamentals of Software Engineering                          *
