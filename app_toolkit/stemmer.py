@@ -62,8 +62,8 @@ def stem(word):
     """
     cv_string = transliterate(word, "am")  # Consonant-vowel string
 
-    suffix_list = load_affixes("data/transliteration_suffix.txt")
-    prefix_list = load_affixes("data/transliteration_prefix.txt")
+    suffix_list = load_affixes("data/stemmer_suffix.txt")
+    prefix_list = load_affixes("data/stemmer_prefix.txt")
 
     # Prepare suffix list
     suffixes = [transliterate(suffix, "am") for suffix in suffix_list]
