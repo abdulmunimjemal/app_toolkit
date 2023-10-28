@@ -1,51 +1,97 @@
-import transliterate
+"""
+*************************************************************************
+* Function: Amharic Word Stemmer - Returns the Amharic root word        *
+* Author: Abdulmunim J Jemal                                            *
+* Prepared as part of the Amharic Spell Checker Project                 *
+* Course: Fundamentals of Software Engineering                          *
+* Department/Campus:  Software Engineering/AAiT                         *
+* Date:  29/10/2023 G.C                                                 *
+*************************************************************************
+"""
 
-suffix_list = (
-    "ኦችኣችኧውንንኣ|ኦችኣችህኡ|ኦችኣችኧው|ኣችኧውንንኣ|ኦችኣችኧው|ኢዕኧልኧሽ|ኦችኣችን|ኣውኢው|ኣችኧውኣል|ችኣት|ችኣችህኡ|ችኣችኧው|ኣልኧህኡ|ኣውኦች|ኣልኧህ|ኣልኧሽ|ኣልችህኡ|ኣልኣልኧች|ብኣችኧውስ|ብኣችኧው|ኣችኧውን|ኣልኧች|ኣልኧን|ኣልኣችህኡ|ኣችህኡን|ኣችህኡ|ኣችህኡት|ውኦችንንኣ|ውኦችን|ኣችኧው|ውኦችኡን|ውኦችኡ|ውንኣ|ኦችኡን|ውኦች|ኝኣንኧትም|ኝኣንኣ|ኝኣንኧት|ኝኣን|ኝኣውም|ኝኣው|ኣውኣ|ብኧት|ኦች|ኦችኡ|ውኦን|ኝኣ|ኝኣውን|ኝኣው|ኦችን|ኣል|ም|ሽው|ክም|ኧው|ውኣ|ትም|ውኦ|ውም|ውን|ንም|ሽን|ኣች|ኡት|ኢት|ክኡ|ኤ|ህ|ሽ|ኡ|ሽ|ክ|ች|ኡን|ን|ም|ንኣ"
-)
-prefix_list = "ስልኧምኣይ|ይኧምኣት|ዕንድኧ|ይኧትኧ|ብኧምኣ|ብኧትኧ|ዕኧል|ስልኧ|ምኧስ|ዕይኧ|ይኣል|ስኣት|ስኣን|ስኣይ|ስኣል|ይኣስ|ይኧ|ልኧ|ብኧ|ክኧ|እን|አል|አስ|ትኧ|አት|አን|አይ|ይ|አ|እ"
 
-sfx_arr = []
-pfx_arr = []
+from transliterate import transliterate
+import re
 
-# Prepare suffix array
-sarr = suffix_list.split("|")
-for suffix in sarr:
-    sfx_arr.append(transliterate.transliterate(suffix, 'am'))
 
-sfx_arr.append("Wa")  # Special case for ሯ
+def load_affixes(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        return [line.rstrip() for line in f.readlines()]
 
-# Prepare prefix array
-parr = prefix_list.split("|")
-for prefix in parr:
-    pfx_arr.append(transliterate.transliterate(prefix, 'am'))
+
+def remove_suffix(cv_string, suffix):
+    regex = re.compile(re.escape(suffix) + "$", re.IGNORECASE)
+    return re.sub(regex, "", cv_string)
+
+
+def remove_prefix(cv_string, prefix):
+    regex = re.compile("^" + re.escape(prefix), re.IGNORECASE)
+    return re.sub(regex, "", cv_string)
+
+
+def remove_infix(cv_string):
+    if re.search(r".+([^aeiou])[aeiou]\1[aeiou].?", cv_string, re.IGNORECASE):
+        return re.sub(r"\S\S[^aeiou][aeiou]", cv_string[0] + cv_string[1], cv_string, flags=re.IGNORECASE)
+    elif re.match(r"^(.+)a\1$", cv_string, re.IGNORECASE):
+        return re.sub(r"a.+", "", cv_string, flags=re.IGNORECASE)
+    return cv_string
+
+
+def replace_double_consonant_e(cv_string):
+    ccv_match = re.search(
+        r"[bcdfghjklmnpqrstvwxyz]{2}e", cv_string, re.IGNORECASE)
+    if ccv_match:
+        ccv = ccv_match.group(0)
+        return re.sub(r"[bcdfghjklmnpqrstvwxyz]{2}e", ccv[0] + "X" + ccv[1], cv_string, flags=re.IGNORECASE)
+    return cv_string
 
 
 def stem(word):
-    cv_string = transliterate.transliterate(word, 'am')
+    """
+    Takes an Amharic word and returns the stem through affix-removal with longest match.
+
+    Args:
+        word (str): Word possibly containing one or more affix.
+
+    Returns:
+        str: The stem of the word passed.
+
+    Example:
+        >>> stem("ልጆቻቸውን")
+        'ልጅ'
+    """
+    cv_string = transliterate(word, "am")  # Consonant-vowel string
+
+    suffix_list = load_affixes("data/transliteration_suffix.txt")
+    prefix_list = load_affixes("data/transliteration_prefix.txt")
+
+    # Prepare suffix list
+    suffixes = [transliterate(suffix, "am") for suffix in suffix_list]
+    suffixes.append("Wa")  # Special case for ሯ
+
+    # Prepare prefix list
+    prefixes = [transliterate(prefix, "am") for prefix in prefix_list]
 
     # Remove suffixes
-    for sfx in sfx_arr:
-        if cv_string.endswith(sfx):
-            cv_string = cv_string[:-len(sfx)]
+    for suffix in suffixes:
+        if cv_string.endswith(suffix):
+            cv_string = remove_suffix(cv_string, suffix)
             break
 
     # Remove prefixes
-    for pfx in pfx_arr:
-        if cv_string.startswith(pfx):
-            cv_string = cv_string[len(pfx):]
+    for prefix in prefixes:
+        if cv_string.startswith(prefix):
+            cv_string = remove_prefix(cv_string, prefix)
             break
 
     # Remove infixes
-    while True:
-        if len(cv_string) >= 3 and not cv_string[0].isnumeric() and cv_string[1] in "aeiou" and cv_string[2] == cv_string[0]:
-            cv_string = cv_string[0] + cv_string[2:]
-        else:
-            break
+    cv_string = remove_infix(cv_string)
 
-    return transliterate.transliterate(cv_string, 'en')
+    # Replace double consonant "e"
+    cv_string = replace_double_consonant_e(cv_string)
+
+    return transliterate(cv_string, "en")
 
 
-# Example usage
-stemmed_word = stem("ልጆቻቸውን")
-print(stemmed_word)  # Output: "ልጅ"
+if __name__ == "__main__":
+    print(stem.__doc__)
