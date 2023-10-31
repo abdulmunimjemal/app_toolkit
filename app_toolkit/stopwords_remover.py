@@ -37,13 +37,14 @@ def remove_stopwords(input_list: list, stopwords_file: str = DEFAULT_PATH) -> li
 
     STOPWORDS_LIST = []
     with open(stopwords_file, 'r', encoding='utf-8') as file:
-        STOPWORDS_LIST = [line.rstrip() for line in file.readlines()]
+        STOPWORDS_LIST = set([line.rstrip() for line in file.readlines()]) # wrapped around set for faster performance
+    
 
     filtered_list = []
-    for line in input_list:
-        line = line.strip()  # remove leading and trailing whitespaces
-        if line not in STOPWORDS_LIST:
-            filtered_list.append(line)
+    for word in input_list:
+        word = word.strip()  # remove leading and trailing whitespaces
+        if word not in STOPWORDS_LIST:
+            filtered_list.append(word)
     return filtered_list
 
 
