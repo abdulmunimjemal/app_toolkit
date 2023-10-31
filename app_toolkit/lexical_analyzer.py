@@ -14,8 +14,8 @@ from collections import defaultdict
 import argparse
 
 
+# Abbreviaitions
 DEFAULT_PATH = "data/abbreviations.txt"
-
 
 abbreviations = defaultdict(lambda: None)
 with open(DEFAULT_PATH, "r", encoding="utf-8") as f:
@@ -23,13 +23,73 @@ with open(DEFAULT_PATH, "r", encoding="utf-8") as f:
         key, value = line.split(":")
         abbreviations[key.strip()] = value.strip()
 
+# Character Level Normalization
+def normalize_char_level(corpus):
+    """
+    A helper function for the lexical analyzer, helping with character level normalization
+    """
+    char_map = {
+        'ሃኅኃሐሓኻ': 'ሀ',
+        'ሑኁዅ': 'ሁ',
+        'ኂሒኺ': 'ሂ',
+        'ኌሔዄ': 'ሄ',
+        'ሕኅ': 'ህ',
+        'ኆሖኾ': 'ሆ',
+        'ሠ': 'ሰ',
+        'ሡ': 'ሱ',
+        'ሢ': 'ሲ',
+        'ሣ': 'ሳ',
+        'ሤ': 'ሴ',
+        'ሥ': 'ስ',
+        'ሦ': 'ሶ',
+        'ዓኣዐ': 'አ',
+        'ዑ': 'ኡ',
+        'ዒ': 'ኢ',
+        'ዔ': 'ኤ',
+        'ዕ': 'እ',
+        'ዖ': 'ኦ',
+        'ጸ': 'ፀ',
+        'ጹ': 'ፁ',
+        'ጺ': 'ፂ',
+        'ጻ': 'ፃ',
+        'ጼ': 'ፄ',
+        'ጽ': 'ፅ',
+        'ጾ': 'ፆ',
+        'ሉ[ዋአ]': 'ሏ',
+        'ሙ[ዋአ]': 'ሟ',
+        'ቱ[ዋአ]': 'ቷ',
+        'ሩ[ዋአ]': 'ሯ',
+        'ሱ[ዋአ]': 'ሷ',
+        'ሹ[ዋአ]': 'ሿ',
+        'ቁ[ዋአ]': 'ቋ',
+        'ቡ[ዋአ]': 'ቧ',
+        'ቹ[ዋአ]': 'ቿ',
+        'ሁ[ዋአ]': 'ኋ',
+        'ኑ[ዋአ]': 'ኗ',
+        'ኙ[ዋአ]': 'ኟ',
+        'ኩ[ዋአ]': 'ኳ',
+        'ዙ[ዋአ]': 'ዟ',
+        'ጉ[ዋአ]': 'ጓ',
+        'ደ[ዋአ]': 'ዷ',
+        'ጡ[ዋአ]': 'ጧ',
+        'ጩ[ዋአ]': 'ጯ',
+        'ጹ[ዋአ]': 'ጿ',
+        'ፉ[ዋአ]': 'ፏ',
+        '[ቊ]': 'ቁ',  # ቁ can be written as ቊ
+        '[ኵ]': 'ኩ',  # ኩ can be also written as ኵ
+    }
+    
+    for pattern, replacement in char_map.items():
+        corpus = re.sub(pattern, replacement, corpus)
+    
+    return corpus
 
-def lexical_analyze(corpus: str, abbr: bool = True, punc: bool = True, numbers: bool = True) -> str:
+def lexical_analyze(corpus: str, abbr: bool = True, punc: bool = True, numbers: bool = True, normalization: bool=True) -> str:
     """
     Separates words, expands common Amharic abbreviations, removes numbers, breaks up hyphenated words, and removes punctuation.
 
     Args:
-        corpus (str): Amharic text.
+        corpus (str): Amharic text.       
 
     Returns:
         str: Lexically analyzed Amharic text.
@@ -50,6 +110,8 @@ def lexical_analyze(corpus: str, abbr: bool = True, punc: bool = True, numbers: 
     if numbers:
         corpus = re.sub(r"[.፩፪፫፬፭፮፮፰፱፲፳፴፵፵፷፸፹፺፻0123456789]", " ", corpus)
         corpus = re.sub(r"\s{2,}", " ", corpus)
+    if normalization:
+        corpus = normalize_char_level(corpus=corpus)
 
     return corpus
 
