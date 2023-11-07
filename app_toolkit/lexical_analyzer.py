@@ -11,6 +11,7 @@
 
 import re
 from collections import defaultdict
+from .stopwords_remover import remove_stopwords
 import argparse
 
 
@@ -24,6 +25,8 @@ with open(DEFAULT_PATH, "r", encoding="utf-8") as f:
         abbreviations[key.strip()] = value.strip()
 
 # Character Level Normalization
+
+
 def normalize_char_level(corpus):
     """
     A helper function for the lexical analyzer, helping with character level normalization
@@ -78,13 +81,14 @@ def normalize_char_level(corpus):
         '[ቊ]': 'ቁ',  # ቁ can be written as ቊ
         '[ኵ]': 'ኩ',  # ኩ can be also written as ኵ
     }
-    
+
     for pattern, replacement in char_map.items():
         corpus = re.sub(pattern, replacement, corpus)
-    
+
     return corpus
 
-def lexical_analyze(corpus: str, abbr: bool = True, punc: bool = True, numbers: bool = True, normalization: bool=True) -> str:
+
+def lexical_analyze(corpus: str, abbr: bool = True, punc: bool = True, numbers: bool = True, normalization: bool = True, stopwords: bool = False) -> str:
     """
     Separates words, expands common Amharic abbreviations, removes numbers, breaks up hyphenated words, and removes punctuation.
 
@@ -104,14 +108,17 @@ def lexical_analyze(corpus: str, abbr: bool = True, punc: bool = True, numbers: 
         for key, value in abbreviations.items():
             regex = re.compile(re.escape(key))
             corpus = regex.sub(value, corpus)
-
     if punc:
         corpus = re.sub(r"[.\?\"',/#!$%^&*;:፤።{}=\-_\`~()]", " ", corpus)
+        pattern = r'[A-Za-z!@#&$%^*()]'
+        corpus = re.sub(pattern, '', corpus)
     if numbers:
         corpus = re.sub(r"[.፩፪፫፬፭፮፮፰፱፲፳፴፵፵፷፸፹፺፻0123456789]", " ", corpus)
         corpus = re.sub(r"\s{2,}", " ", corpus)
     if normalization:
         corpus = normalize_char_level(corpus=corpus)
+    if stopwords:
+        corpus = remove_stopwords(corpus)
 
     return corpus
 
@@ -126,7 +133,7 @@ if __name__ == "__main__":
     corpus = ""
     with open(args.input_txt, "r", encoding="utf-8") as f:
         corpus = f.read()
-    output_text = lexical_analyze(corpus, abbr=False, punc=False)
+    output_text = lexical_analyzer(corpus, abbr=False, punc=False)
     with open(args.output_txt, "w", encoding="utf-8") as f:
         f.write(output_text)
     print("Lexical analysis completed successfully!")
