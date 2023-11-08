@@ -1,6 +1,7 @@
 # Amharic PreProcessing Toolkit (APP-TOOLKIT)
 
 The Amharic PreProcessing Toolkit (APP-TOOLKIT) is a collection of Python modules and utilities designed for text processing and preprocessing tasks in Amharic. This toolkit provides functions for stemming, stopwords removal, transliteration, and other text cleaning tasks.
+It is done as part of a Software Engineering Project featuring "Context-Aware Amharic Spell Checker."
 
 ## Project Structure
 
@@ -14,9 +15,9 @@ The project is organized as follows:
   - `cleaners/`: This subdirectory contains utility functions for text cleaning, such as duplicate removal.
 
 - **data/**: You can store data files or resources in this directory if needed for text processing.
-
+<!--
 - **docs/**: This directory can be used for project documentation, but it's currently empty.
-
+-->
 - **test/**: You can place your test files or scripts in this directory to test the functionality of the toolkit.
 
 ## Usage
