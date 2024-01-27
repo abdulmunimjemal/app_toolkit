@@ -22,7 +22,7 @@ The project is organized as follows:
 
 ## Usage
 
-To use the APP-TOOLKIT, you can import the required modules and functions into your Python scripts. Below is an example of how to use some of the toolkit's functionalities:
+To use the APP-Toolkit, you can import the required modules and functions into your Python scripts. Below is an example of how to use some of the toolkit's functionalities:
 
 ```python
 from app_toolkit import stemmer, stopwords_remover, transliterate
